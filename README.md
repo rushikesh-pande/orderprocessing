@@ -15,6 +15,20 @@ Microservice for processing customer orders with inventory checks and validation
 ### Process Order
 **POST** `/api/v1/processing`
 
+**🆕 ENHANCEMENTS:**
+
+### Latest Offers (NEW)
+**GET** `/api/v1/offers/latest` - Get all latest offers
+**GET** `/api/v1/offers/applicable?orderAmount={amount}&category={category}` - Get applicable offers
+**GET** `/api/v1/offers/best?orderAmount={amount}&category={category}` - Get best offer recommendation
+
+**Enhancement Features:**
+- Flash deals and limited-time offers
+- Category-specific promotions
+- Order amount-based offer eligibility
+- Automatic best offer recommendation
+- Real-time offer validation
+
 **Request Body:**
 ```json
 {

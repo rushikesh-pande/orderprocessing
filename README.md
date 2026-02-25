@@ -1,7 +1,7 @@
 # orderprocessing
 
 ## Overview
-Microservice for: **Process order:- do all necessary action for processing customer order**
+Microservice for: **Process order: - do all necessary action for processing customer order here please give choices of latest offer to customer, publish event in kafka topic**
 
 ## Tech Stack
 - Java 17

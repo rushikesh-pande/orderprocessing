@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProcessingResponse {
 
+    /** TraceId for end-to-end request tracking */
+    private String traceId;
+
+
     private String orderId;
     private String status;
     private Boolean inventoryAvailable;

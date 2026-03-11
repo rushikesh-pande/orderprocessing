@@ -1,0 +1,79 @@
+# Monitoring Enhancement: Prometheus Alert Rules for orderprocessing
+# Deploy to AlertManager alongside Prometheus scrape config.
+groups:
+  - name: orderprocessing_alerts
+    interval: 30s
+    rules:
+
+      # ── High Error Rate ──────────────────────────────────────────────────────
+      - alert: HighErrorRate_orderprocessing
+        expr: |
+          rate(orderprocessing_errors_total{service="orderprocessing"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: orderprocessing
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }} on orderprocessing"
+
+      # ── High HTTP Latency ────────────────────────────────────────────────────
+      - alert: HighLatency_orderprocessing
+        expr: |
+          histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{service="orderprocessing"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: orderprocessing
+        annotations:
+          summary: "p95 latency above 2s on orderprocessing"
+          description: "p95 latency is {{ $value }}s on orderprocessing"
+
+      # ── Service Down ─────────────────────────────────────────────────────────
+      - alert: ServiceDown_orderprocessing
+        expr: |
+          up{job="orderprocessing"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: orderprocessing
+        annotations:
+          summary: "orderprocessing is DOWN"
+          description: "orderprocessing Prometheus target is not reachable"
+
+      # ── High Heap Memory ─────────────────────────────────────────────────────
+      - alert: HighHeapMemory_orderprocessing
+        expr: |
+          (jvm_memory_used_bytes{service="orderprocessing",area="heap"} /
+           jvm_memory_max_bytes{service="orderprocessing",area="heap"}) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: orderprocessing
+        annotations:
+          summary: "JVM Heap above 85% on orderprocessing"
+          description: "Heap usage is {{ $value | humanizePercentage }} on orderprocessing"
+
+      # ── Too Many 5xx Responses ───────────────────────────────────────────────
+      - alert: High5xxRate_orderprocessing
+        expr: |
+          rate(http_server_requests_seconds_count{service="orderprocessing",status=~"5.."}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: orderprocessing
+        annotations:
+          summary: "High 5xx rate on orderprocessing"
+          description: "5xx rate is {{ $value | humanize }} req/s on orderprocessing"
+
+      # ── High CPU Usage ───────────────────────────────────────────────────────
+      - alert: HighCpuUsage_orderprocessing
+        expr: |
+          process_cpu_usage{service="orderprocessing"} > 0.80
+        for: 5m
+        labels:
+          severity: warning
+          service: orderprocessing
+        annotations:
+          summary: "CPU above 80% on orderprocessing"
+          description: "CPU usage is {{ $value | humanizePercentage }} on orderprocessing"
